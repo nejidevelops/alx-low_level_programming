@@ -1,10 +1,3 @@
-
-
-/*
- * File: 0-hash_table_create.c
- * Auth Newton Ombese
- */
-
 #include "hash_tables.h"
 
 /**

@@ -1,52 +1,53 @@
 #include "hash_tables.h"
 
 /**
- * hash_table_set - creates the nodes for the hash table
- * @ht: hash table
- * @key: the key
- * @value: the value
- * Return: bool
-*/
+ * hash_table_set - Add or update an element in a hash table.
+ * @ht: A pointer to the hash table.
+ * @key: The key to add - cannot be an empty string.
+ * @value: The value associated with key.
+ *
+ * Return: Upon failure - 0.
+ *         Otherwise - 1.
+ */
 int hash_table_set(hash_table_t *ht, const char *key, const char *value)
 {
-	unsigned long int idx = 0;
-	hash_node_t *new_table = NULL, *aux_key = NULL;
+	hash_node_t *new;
+	char *value_copy;
+	unsigned long int index, i;
 
-	if (ht == NULL || key == NULL || strcmp(key, "") == 0)
+	if (ht == NULL || key == NULL || *key == '\0' || value == NULL)
 		return (0);
-	idx = key_index((const unsigned char *) key, ht->size);
-	aux_key = ht->array[idx];
 
-	while (aux_key != NULL)
+	value_copy = strdup(value);
+	if (value_copy == NULL)
+		return (0);
+
+	index = key_index((const unsigned char *)key, ht->size);
+	for (i = index; ht->array[i]; i++)
 	{
-		if (strcmp(key, aux_key->key) == 0)
+		if (strcmp(ht->array[i]->key, key) == 0)
 		{
-			free(aux_key->value);
-			aux_key->value = strdup(value);
+			free(ht->array[i]->value);
+			ht->array[i]->value = value_copy;
 			return (1);
 		}
-		aux_key = aux_key->next;
 	}
-	new_table = malloc(sizeof(hash_node_t));
-	if (new_table == NULL)
-		return (0);
-	new_table->key = strdup(key);
-	if (new_table->key == NULL)
+
+	new = malloc(sizeof(hash_node_t));
+	if (new == NULL)
 	{
-		free(new_table);
+		free(value_copy);
 		return (0);
 	}
-	new_table->value = strdup(value);
-	if (new_table->value == NULL)
+	new->key = strdup(key);
+	if (new->key == NULL)
 	{
-		free(new_table->key);
-		free(new_table);
+		free(new);
 		return (0);
 	}
-	new_table->next = NULL;
-	if (ht->array[idx] != NULL)
-		new_table->next = ht->array[idx];
-	ht->array[idx] = new_table;
+	new->value = value_copy;
+	new->next = ht->array[index];
+	ht->array[index] = new;
 
 	return (1);
 }
