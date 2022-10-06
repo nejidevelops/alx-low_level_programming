@@ -1,3 +1,8 @@
+/*
+ * File: 0-linear.c
+ * Auth: Newton Ombese
+ */
+
 #include "search_algos.h"
 
 /**
